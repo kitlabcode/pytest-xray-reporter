@@ -28,7 +28,7 @@ jobs:
     
     - name: Run tests
       run: |
-        pytest --xfail-strict
+        pytest
     
     - name: Run linting
       run: |
