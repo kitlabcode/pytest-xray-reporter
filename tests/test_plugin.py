@@ -34,9 +34,11 @@ def test_plugin_output(tmp_path):
     """Verify the plugin generates correct Xray JSON output."""
     output_file = tmp_path / "xray-results.json"
     
+    # Create a config object
+    config = pytest.Config.fromdictargs({}, ["--xray-output", str(output_file)])
+    
     # Create and configure the plugin
-    plugin = XrayReporter()
-    plugin.xray_output = str(output_file)
+    plugin = XrayReporter(config)
     
     # Run pytest with our plugin
     result = pytest.main([
