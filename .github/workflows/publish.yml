@@ -19,10 +19,39 @@ jobs:
       - name: Install build dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install build twine
+          pip install --upgrade setuptools build twine
+      - name: Debug setup
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "\nDirectory contents:"
+          ls -la
+          echo "\npyproject.toml contents:"
+          cat pyproject.toml
+          echo "\n__init__.py contents:"
+          cat pytest_xray_reporter/__init__.py
+          echo "\nPython version:"
+          python --version
+          echo "\nSetuptools version:"
+          pip show setuptools
+          echo "\nBuild version:"
+          pip show build
+      - name: Clean build artifacts
+        run: |
+          rm -rf dist/ build/ *.egg-info/
       - name: Build package
-        run: python -m build
+        run: |
+          echo "Building package..."
+          python -m build -v
+          echo "\nBuilt files:"
+          ls -la dist/
+          echo "\nWheel file contents:"
+          unzip -l dist/*.whl
+          echo "\nMetadata contents:"
+          unzip -p dist/*.whl "*.dist-info/METADATA" || echo "No METADATA found"
       - name: Check package metadata
-        run: twine check dist/*
+        run: |
+          echo "Running twine check..."
+          twine check dist/*
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@v1.8.11 
