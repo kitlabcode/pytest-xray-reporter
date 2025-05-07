@@ -42,7 +42,7 @@ jobs:
       - name: Build package
         run: |
           echo "Building package..."
-          python -m build -v
+          python -m build --wheel -v
           echo "\nBuilt files:"
           ls -la dist/
           echo "\nWheel file contents:"
@@ -54,4 +54,6 @@ jobs:
           echo "Running twine check..."
           twine check dist/*
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.8.11 
+        uses: pypa/gh-action-pypi-publish@v1.8.11
+        with:
+          package-name: pytest-xray-reporter 
