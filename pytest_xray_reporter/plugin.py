@@ -126,6 +126,7 @@ class XrayReporter:
 
     def _get_status(self, outcome: str) -> str:
         """Convert pytest outcome to Xray status."""
+            
         return {
             "passed": "PASSED",
             "failed": "FAILED",
