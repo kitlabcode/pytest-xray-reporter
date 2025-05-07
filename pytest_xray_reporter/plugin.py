@@ -1,11 +1,10 @@
 """Pytest plugin for generating Xray JSON reports."""
+
 import base64
 import json
+import platform
 from datetime import datetime, timezone
 from pathlib import Path
-import platform
-
-import pytest
 
 
 class XrayReporter:

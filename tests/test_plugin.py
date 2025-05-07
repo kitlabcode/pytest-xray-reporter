@@ -1,8 +1,8 @@
 """Tests for the pytest-xray-reporter plugin."""
-import json
-import pytest
-from pathlib import Path
+
 import sys
+
+import pytest
 
 
 def test_success():
@@ -13,7 +13,7 @@ def test_success():
 @pytest.mark.xfail(reason="This test is expected to fail")
 def test_failure():
     """A test that should fail."""
-    assert False, "This test is expected to fail"
+    raise AssertionError("This test is expected to fail")
 
 
 @pytest.mark.skip(reason="This test is skipped")
