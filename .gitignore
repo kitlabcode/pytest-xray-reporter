@@ -44,4 +44,7 @@ build/
 
 # Misc
 .DS_Store
-*.log 
+*.log
+
+# Test results
+xray-results.json 
