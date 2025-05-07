@@ -5,14 +5,17 @@ import json
 import platform
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import pytest
 
 
 class XrayReporter:
     """Pytest plugin that generates Xray JSON reports."""
 
-    def __init__(self, config):
+    def __init__(self, config: pytest.Config) -> None:
         self.config = config
-        self.results = {
+        self.results: Dict[str, Any] = {
             "tests": [],
             "info": {
                 "summary": {
@@ -30,9 +33,9 @@ class XrayReporter:
             },
         }
         self.start_time = datetime.now(timezone.utc)
-        self._current_test = None
+        self._current_test: Optional[Dict[str, Any]] = None
 
-    def pytest_runtest_logstart(self, nodeid):
+    def pytest_runtest_logstart(self, nodeid: str) -> None:
         """Record test start time."""
         self._current_test = {
             "testKey": nodeid,
@@ -43,14 +46,14 @@ class XrayReporter:
             "customFields": {},
         }
 
-    def pytest_runtest_logreport(self, report):
+    def pytest_runtest_logreport(self, report: pytest.TestReport) -> None:
         """Process test results and collect evidence."""
         if report.when == "call" or (report.when == "setup" and report.outcome == "skipped"):
             if not self._current_test:
                 return
 
             # Get captured output
-            evidence = []
+            evidence: List[Dict[str, str]] = []
 
             # Add stdout if present
             if report.capstdout:
@@ -135,12 +138,11 @@ class XrayReporter:
 
     def _get_status(self, outcome: str) -> str:
         """Convert pytest outcome to Xray status."""
-
         return {"passed": "PASSED", "failed": "FAILED", "error": "ERROR", "skipped": "SKIPPED"}.get(
             outcome, "UNKNOWN"
         )
 
-    def pytest_sessionfinish(self, session):
+    def pytest_sessionfinish(self, session: pytest.Session) -> None:
         """Write results to file when test session ends."""
         # Add test environment info
         self.results["info"]["testEnvironments"] = [
@@ -166,7 +168,7 @@ class XrayReporter:
                 json.dump(self.results, f, indent=2)
 
 
-def pytest_addoption(parser):
+def pytest_addoption(parser: pytest.Parser) -> None:
     """Add command line options."""
     group = parser.getgroup("xray-reporter")
     group.addoption(
@@ -192,6 +194,6 @@ def pytest_addoption(parser):
     )
 
 
-def pytest_configure(config):
+def pytest_configure(config: pytest.Config) -> None:
     """Register the plugin."""
     config.pluginmanager.register(XrayReporter(config))
