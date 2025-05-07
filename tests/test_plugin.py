@@ -10,6 +10,7 @@ def test_success():
     assert True
 
 
+@pytest.mark.xfail(reason="This test is expected to fail")
 def test_failure():
     """A test that should fail."""
     assert False, "This test is expected to fail"
