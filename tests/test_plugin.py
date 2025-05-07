@@ -26,4 +26,4 @@ def test_with_output(capsys):
     """A test that produces output."""
     print("This is stdout")
     print("This is stderr", file=sys.stderr)
-    assert True 
+    assert True

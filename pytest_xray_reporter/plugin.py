@@ -22,13 +22,13 @@ class XrayReporter:
                     "failed": 0,
                     "errors": 0,
                     "skipped": 0,
-                    "duration": 0.0
+                    "duration": 0.0,
                 },
                 "testEnvironments": [],
                 "project": None,
                 "testPlanKey": None,
-                "testExecutionKey": None
-            }
+                "testExecutionKey": None,
+            },
         }
         self.start_time = datetime.now(timezone.utc)
         self._current_test = None
@@ -41,7 +41,7 @@ class XrayReporter:
             "evidence": [],
             "steps": [],
             "defects": [],
-            "customFields": {}
+            "customFields": {},
         }
 
     def pytest_runtest_logreport(self, report):
@@ -49,41 +49,49 @@ class XrayReporter:
         if report.when == "call" or (report.when == "setup" and report.outcome == "skipped"):
             if not self._current_test:
                 return
-                
+
             # Get captured output
             evidence = []
-            
+
             # Add stdout if present
             if report.capstdout:
-                evidence.append({
-                    "data": base64.b64encode(report.capstdout.encode()).decode(),
-                    "filename": "stdout.txt",
-                    "contentType": "text/plain"
-                })
-            
+                evidence.append(
+                    {
+                        "data": base64.b64encode(report.capstdout.encode()).decode(),
+                        "filename": "stdout.txt",
+                        "contentType": "text/plain",
+                    }
+                )
+
             # Add stderr if present
             if report.capstderr:
-                evidence.append({
-                    "data": base64.b64encode(report.capstderr.encode()).decode(),
-                    "filename": "stderr.txt",
-                    "contentType": "text/plain"
-                })
-            
+                evidence.append(
+                    {
+                        "data": base64.b64encode(report.capstderr.encode()).decode(),
+                        "filename": "stderr.txt",
+                        "contentType": "text/plain",
+                    }
+                )
+
             # Add stack trace for failures/errors
             if report.longrepr:
-                evidence.append({
-                    "data": base64.b64encode(str(report.longrepr).encode()).decode(),
-                    "filename": "stacktrace.txt",
-                    "contentType": "text/plain"
-                })
+                evidence.append(
+                    {
+                        "data": base64.b64encode(str(report.longrepr).encode()).decode(),
+                        "filename": "stacktrace.txt",
+                        "contentType": "text/plain",
+                    }
+                )
 
             # Add captured log if available
             if hasattr(report, "caplog"):
-                evidence.append({
-                    "data": base64.b64encode(report.caplog.encode()).decode(),
-                    "filename": "test.log",
-                    "contentType": "text/plain"
-                })
+                evidence.append(
+                    {
+                        "data": base64.b64encode(report.caplog.encode()).decode(),
+                        "filename": "test.log",
+                        "contentType": "text/plain",
+                    }
+                )
 
             # Calculate test duration
             finish_time = datetime.now(timezone.utc)
@@ -97,16 +105,18 @@ class XrayReporter:
                     self._current_test["customFields"][marker] = str(report.keywords[marker])
 
             # Create test result in Xray format
-            self._current_test.update({
-                "finish": finish_time.isoformat(),
-                "status": self._get_status(report.outcome),
-                "comment": str(report.longrepr) if report.longrepr else "",
-                "evidence": evidence,
-                "duration": duration
-            })
+            self._current_test.update(
+                {
+                    "finish": finish_time.isoformat(),
+                    "status": self._get_status(report.outcome),
+                    "comment": str(report.longrepr) if report.longrepr else "",
+                    "evidence": evidence,
+                    "duration": duration,
+                }
+            )
 
             self.results["tests"].append(self._current_test)
-            
+
             # Update summary
             self.results["info"]["summary"]["total"] += 1
             if report.outcome == "passed":
@@ -117,22 +127,19 @@ class XrayReporter:
                 self.results["info"]["summary"]["errors"] += 1
             elif report.outcome == "skipped":
                 self.results["info"]["summary"]["skipped"] += 1
-            
+
             # Update duration
             self.results["info"]["summary"]["duration"] += duration
-            
+
             # Reset current test
             self._current_test = None
 
     def _get_status(self, outcome: str) -> str:
         """Convert pytest outcome to Xray status."""
-            
-        return {
-            "passed": "PASSED",
-            "failed": "FAILED",
-            "error": "ERROR",
-            "skipped": "SKIPPED"
-        }.get(outcome, "UNKNOWN")
+
+        return {"passed": "PASSED", "failed": "FAILED", "error": "ERROR", "skipped": "SKIPPED"}.get(
+            outcome, "UNKNOWN"
+        )
 
     def pytest_sessionfinish(self, session):
         """Write results to file when test session ends."""
@@ -140,15 +147,17 @@ class XrayReporter:
         self.results["info"]["testEnvironments"] = [
             platform.system(),
             platform.release(),
-            platform.python_version()
+            platform.python_version(),
         ]
 
         # Get optional info from config
-        self.results["info"].update({
-            "project": self.config.getoption("--xray-project", default=None),
-            "testPlanKey": self.config.getoption("--xray-test-plan", default=None),
-            "testExecutionKey": self.config.getoption("--xray-test-execution", default=None)
-        })
+        self.results["info"].update(
+            {
+                "project": self.config.getoption("--xray-project", default=None),
+                "testPlanKey": self.config.getoption("--xray-test-plan", default=None),
+                "testExecutionKey": self.config.getoption("--xray-test-execution", default=None),
+            }
+        )
 
         output_file = self.config.getoption("--xray-output")
         if output_file:
@@ -186,4 +195,4 @@ def pytest_addoption(parser):
 
 def pytest_configure(config):
     """Register the plugin."""
-    config.pluginmanager.register(XrayReporter(config)) 
+    config.pluginmanager.register(XrayReporter(config))
