@@ -1,0 +1,1 @@
+# pytest-xray-reporter
