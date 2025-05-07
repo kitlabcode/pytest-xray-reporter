@@ -3,7 +3,6 @@ import json
 import pytest
 from pathlib import Path
 import sys
-from pytest_xray_reporter.plugin import XrayReporter
 
 
 def test_success():
@@ -11,7 +10,6 @@ def test_success():
     assert True
 
 
-@pytest.mark.xfail(reason="This test is expected to fail")
 def test_failure():
     """A test that should fail."""
     assert False, "This test is expected to fail"
@@ -34,17 +32,12 @@ def test_plugin_output(tmp_path):
     """Verify the plugin generates correct Xray JSON output."""
     output_file = tmp_path / "xray-results.json"
     
-    # Create a config object
-    config = pytest.Config.fromdictargs({}, ["--xray-output", str(output_file)])
-    
-    # Create and configure the plugin
-    plugin = XrayReporter(config)
-    
     # Run pytest with our plugin
     result = pytest.main([
         "-v",
+        "--xray-output", str(output_file),
         __file__  # Plugin is loaded automatically
-    ], plugins=[plugin])
+    ])
     
     # Read and verify the output
     with open(output_file) as f:
