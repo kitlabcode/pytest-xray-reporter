@@ -3,6 +3,7 @@ import json
 import pytest
 from pathlib import Path
 import sys
+from pytest_xray_reporter.plugin import XrayReporter
 
 
 def test_success():
@@ -33,12 +34,15 @@ def test_plugin_output(tmp_path):
     """Verify the plugin generates correct Xray JSON output."""
     output_file = tmp_path / "xray-results.json"
     
+    # Create and configure the plugin
+    plugin = XrayReporter()
+    plugin.xray_output = str(output_file)
+    
     # Run pytest with our plugin
     result = pytest.main([
         "-v",
-        "--xray-output", str(output_file),
         __file__  # Plugin is loaded automatically
-    ])
+    ], plugins=[plugin])
     
     # Read and verify the output
     with open(output_file) as f:
