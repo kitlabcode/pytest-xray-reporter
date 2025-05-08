@@ -66,4 +66,7 @@ disallow_incomplete_defs = true
 line-length = 100
 target-version = "py38"
 select = ["E", "F", "B", "I"]
-ignore = [] 
+ignore = []
+
+[project.entry-points.pytest11]
+pytest_xray_reporter = "pytest_xray_reporter.plugin" 
