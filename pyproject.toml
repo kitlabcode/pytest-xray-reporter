@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pytest-xray-reporter"
-version = "0.1.11"
+version = "0.1.12"
 description = "A pytest plugin that generates test results in Xray JSON format"
 readme = "README.md"
 requires-python = ">=3.8"
