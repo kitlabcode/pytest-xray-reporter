@@ -40,20 +40,14 @@ class XrayReporter:
         """Record test start time."""
         # Extract test name from nodeid (e.g., "tests/test_plugin.py::test_with_output" -> "test_with_output")
         test_name = nodeid.split("::")[-1]
-        
+
         self._current_test = {
             "testKey": test_name,
             "start": datetime.now(timezone.utc).isoformat(),
             "evidence": [],
             "steps": [],
             "defects": [],
-            "customFields": [
-                {
-                    "id": "test_path",
-                    "name": "Test Path",
-                    "value": nodeid
-                }
-            ],
+            "customFields": [{"id": "test_path", "name": "Test Path", "value": nodeid}],
         }
         # Add marker reasons if present
         for marker_info in self.marker_reasons.get(nodeid, []):
@@ -116,15 +110,20 @@ class XrayReporter:
             if hasattr(report, "keywords"):
                 for marker in report.keywords:
                     # Skip empty markers and internal pytest markers
-                    if not marker or marker.startswith("test_") or marker in ["pytestmark", "pytest-xray-reporter", "tests", "skip", "xfail"]:
+                    if (
+                        not marker
+                        or marker.startswith("test_")
+                        or marker
+                        in ["pytestmark", "pytest-xray-reporter", "tests", "skip", "xfail"]
+                    ):
                         continue
-                    
+
                     # Get marker value and arguments
                     marker_obj = report.keywords[marker]
                     print(f"DEBUG: Marker {marker}: {marker_obj}")  # Debug print
                     print(f"DEBUG: Marker type: {type(marker_obj)}")  # Debug print
                     print(f"DEBUG: Marker dir: {dir(marker_obj)}")  # Debug print
-                    
+
                     if hasattr(marker_obj, "args") and marker_obj.args:
                         value = str(marker_obj.args[0])
                         print(f"DEBUG: Using args[0]: {value}")  # Debug print
@@ -134,16 +133,14 @@ class XrayReporter:
                     else:
                         value = str(marker_obj)
                         print(f"DEBUG: Using str(marker_obj): {value}")  # Debug print
-                    
+
                     # Only add markers that have meaningful values
                     if value and value != "1":
                         # Convert marker to a more readable name (e.g., "xfail" -> "Expected Failure")
                         name = marker.replace("_", " ").title()
-                        self._current_test["customFields"].append({
-                            "id": marker,
-                            "name": name,
-                            "value": value
-                        })
+                        self._current_test["customFields"].append(
+                            {"id": marker, "name": name, "value": value}
+                        )
 
             # Create test result in Xray format
             self._current_test.update(
@@ -248,8 +245,10 @@ def pytest_collection_modifyitems(session, config, items):
             if marker.name in ("skip", "xfail") and "reason" in marker.kwargs:
                 if nodeid not in reporter.marker_reasons:
                     reporter.marker_reasons[nodeid] = []
-                reporter.marker_reasons[nodeid].append({
-                    "id": marker.name,
-                    "name": marker.name.title(),
-                    "value": marker.kwargs["reason"]
-                })
+                reporter.marker_reasons[nodeid].append(
+                    {
+                        "id": marker.name,
+                        "name": marker.name.title(),
+                        "value": marker.kwargs["reason"],
+                    }
+                )
