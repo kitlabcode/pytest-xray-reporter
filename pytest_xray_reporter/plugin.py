@@ -237,7 +237,11 @@ def pytest_configure(config: pytest.Config) -> None:
     config.pluginmanager.register(XrayReporter(config), name="xray-reporter")
 
 
-def pytest_collection_modifyitems(session, config, items):
+def pytest_collection_modifyitems(
+    session: pytest.Session,
+    config: pytest.Config,
+    items: List[pytest.Item],
+) -> None:
     reporter = config.pluginmanager.getplugin("xray-reporter")
     if not hasattr(reporter, "marker_reasons"):
         return
@@ -247,10 +251,8 @@ def pytest_collection_modifyitems(session, config, items):
             if marker.name in ("skip", "xfail") and "reason" in marker.kwargs:
                 if nodeid not in reporter.marker_reasons:
                     reporter.marker_reasons[nodeid] = []
-                reporter.marker_reasons[nodeid].append(
-                    {
-                        "id": marker.name,
-                        "name": marker.name.title(),
-                        "value": marker.kwargs["reason"],
-                    }
-                )
+                reporter.marker_reasons[nodeid].append({
+                    "id": marker.name,
+                    "name": marker.name.title(),
+                    "value": marker.kwargs["reason"]
+                })
