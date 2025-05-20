@@ -251,8 +251,10 @@ def pytest_collection_modifyitems(
             if marker.name in ("skip", "xfail") and "reason" in marker.kwargs:
                 if nodeid not in reporter.marker_reasons:
                     reporter.marker_reasons[nodeid] = []
-                reporter.marker_reasons[nodeid].append({
-                    "id": marker.name,
-                    "name": marker.name.title(),
-                    "value": marker.kwargs["reason"]
-                })
+                reporter.marker_reasons[nodeid].append(
+                    {
+                        "id": marker.name,
+                        "name": marker.name.title(),
+                        "value": marker.kwargs["reason"],
+                    }
+                )
