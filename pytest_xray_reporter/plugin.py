@@ -38,7 +38,8 @@ class XrayReporter:
 
     def pytest_runtest_logstart(self, nodeid: str) -> None:
         """Record test start time."""
-        # Extract test name from nodeid (e.g., "tests/test_plugin.py::test_with_output" -> "test_with_output")
+        # Extract test name from nodeid
+        # e.g., "tests/test_plugin.py::test_with_output" -> "test_with_output"
         test_name = nodeid.split("::")[-1]
 
         self._current_test = {
@@ -136,7 +137,8 @@ class XrayReporter:
 
                     # Only add markers that have meaningful values
                     if value and value != "1":
-                        # Convert marker to a more readable name (e.g., "xfail" -> "Expected Failure")
+                        # Convert marker to a more readable name
+                        # e.g., "xfail" -> "Expected Failure"
                         name = marker.replace("_", " ").title()
                         self._current_test["customFields"].append(
                             {"id": marker, "name": name, "value": value}
