@@ -43,6 +43,7 @@ class XrayReporter:
                 "No Xray test key provided. Using test function name as test key. "
                 "Results may not be properly linked in Jira Xray.",
                 UserWarning,
+                stacklevel=2
             )
 
     def pytest_runtest_logstart(self, nodeid: str) -> None:
@@ -240,7 +241,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption(
         "--xray-test-key",
         action="store",
-        help="Xray test key to use for all tests (if not provided, uses test function name and logs a warning)",
+        help="Xray test key to use for all tests (if not provided, uses test function name)",
     )
 
 
