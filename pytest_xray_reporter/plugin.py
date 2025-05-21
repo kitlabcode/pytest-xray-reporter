@@ -38,10 +38,11 @@ class XrayReporter:
         self.test_key = config.getoption("--xray-test-key")
         if not self.test_key:
             import warnings
+
             warnings.warn(
                 "No Xray test key provided. Using test function name as test key. "
                 "Results may not be properly linked in Jira Xray.",
-                UserWarning
+                UserWarning,
             )
 
     def pytest_runtest_logstart(self, nodeid: str) -> None:
