@@ -1,8 +1,28 @@
 """Tests for the pytest-xray-reporter plugin."""
 
 import sys
+from datetime import datetime, timezone, timedelta
 
 import pytest
+from pytest_xray_reporter.plugin import to_isoformat
+
+
+def test_datetime_formatting() -> None:
+    """Test that to_isoformat produces Xray-compatible datetime format."""
+    # Test with UTC timezone
+    dt = datetime(2024, 1, 1, 12, 0, 0, 123456, tzinfo=timezone.utc)
+    result = to_isoformat(dt)
+    assert result == "2024-01-01T12:00:00+00:00"
+
+    # Test with no timezone (should default to UTC)
+    dt = datetime(2024, 1, 1, 12, 0, 0, 123456)
+    result = to_isoformat(dt)
+    assert result == "2024-01-01T12:00:00+00:00"
+
+    # Test with non-UTC timezone
+    dt = datetime(2024, 1, 1, 12, 0, 0, 123456, tzinfo=timezone(offset=timedelta(hours=1)))
+    result = to_isoformat(dt)
+    assert result == "2024-01-01T12:00:00+01:00"
 
 
 def test_success() -> None:
