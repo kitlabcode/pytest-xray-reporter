@@ -1,51 +1,50 @@
 [build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "pytest-xray-reporter"
 version = "0.1.12"
-description = "A pytest plugin that generates test results in Xray JSON format"
+description = "Pytest plugin for generating Xray JSON reports"
 readme = "README.md"
 requires-python = ">=3.8"
-license = { text = "MIT" }
-keywords = ["pytest", "xray", "testing", "reporting"]
+license = "MIT"
 authors = [
-    { name = "Jonathan Kittell", email = "jonathan.kittell@example.com" }
+    { name = "Jonathan Kittell", email = "jonathan.kittell@vecima.com" }
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Framework :: Pytest",
     "Intended Audience :: Developers",
-    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Testing",
+    "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-    "Topic :: Software Development :: Testing",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
 ]
 dependencies = [
     "pytest>=7.0.0",
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/pytest-xray-reporter"
-Documentation = "https://github.com/yourusername/pytest-xray-reporter#readme"
-Repository = "https://github.com/yourusername/pytest-xray-reporter.git"
-Issues = "https://github.com/yourusername/pytest-xray-reporter/issues"
+Homepage = "https://github.com/vecima/pytest-xray-reporter"
+Repository = "https://github.com/vecima/pytest-xray-reporter.git"
+Issues = "https://github.com/vecima/pytest-xray-reporter/issues"
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.0.0",
-    "black>=23.0.0",
-    "isort>=5.0.0",
-    "mypy>=1.0.0",
-    "ruff>=0.1.0",
+    "black",
+    "isort",
+    "mypy",
+    "pytest",
+    "pytest-cov",
+    "ruff",
 ]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
 
 [tool.black]
 line-length = 100
@@ -54,6 +53,7 @@ target-version = ["py38"]
 [tool.isort]
 profile = "black"
 line_length = 100
+multi_line_output = 3
 
 [tool.mypy]
 python_version = "3.8"
@@ -62,11 +62,16 @@ warn_unused_configs = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v"
+
 [tool.ruff]
 line-length = 100
 target-version = "py38"
 select = ["E", "F", "B", "I"]
 ignore = []
 
-[project.entry-points.pytest11]
-pytest_xray_reporter = "pytest_xray_reporter.plugin" 
+[tool.ruff.isort]
+known-first-party = ["pytest_xray_reporter"] 

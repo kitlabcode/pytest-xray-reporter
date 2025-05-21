@@ -1,0 +1,138 @@
+{
+  "tests": [
+    {
+      "testKey": "test_success",
+      "start": "2025-05-21T14:14:44.143506+00:00",
+      "evidence": [
+        {
+          "data": "",
+          "filename": "test.log",
+          "contentType": "text/plain"
+        }
+      ],
+      "steps": [],
+      "defects": [],
+      "customFields": [
+        {
+          "id": "test_path",
+          "name": "Test Path",
+          "value": "tests/test_plugin.py::test_success"
+        }
+      ],
+      "finish": "2025-05-21T14:14:44.143893+00:00",
+      "status": "PASSED",
+      "comment": "",
+      "duration": 0.017746
+    },
+    {
+      "testKey": "test_failure",
+      "start": "2025-05-21T14:14:44.144102+00:00",
+      "evidence": [
+        {
+          "data": "QHB5dGVzdC5tYXJrLnhmYWlsKHJlYXNvbj0iVGhpcyB0ZXN0IGlzIGV4cGVjdGVkIHRvIGZhaWwiKQogICAgZGVmIHRlc3RfZmFpbHVyZSgpIC0+IE5vbmU6CiAgICAgICAgIiIiQSB0ZXN0IHRoYXQgc2hvdWxkIGZhaWwuIiIiCj4gICAgICAgcmFpc2UgQXNzZXJ0aW9uRXJyb3IoIlRoaXMgdGVzdCBpcyBleHBlY3RlZCB0byBmYWlsIikKRSAgICAgICBBc3NlcnRpb25FcnJvcjogVGhpcyB0ZXN0IGlzIGV4cGVjdGVkIHRvIGZhaWwKCnRlc3RzL3Rlc3RfcGx1Z2luLnB5OjE2OiBBc3NlcnRpb25FcnJvcg==",
+          "filename": "stacktrace.txt",
+          "contentType": "text/plain"
+        },
+        {
+          "data": "",
+          "filename": "test.log",
+          "contentType": "text/plain"
+        }
+      ],
+      "steps": [],
+      "defects": [],
+      "customFields": [
+        {
+          "id": "test_path",
+          "name": "Test Path",
+          "value": "tests/test_plugin.py::test_failure"
+        }
+      ],
+      "finish": "2025-05-21T14:14:44.151708+00:00",
+      "status": "SKIPPED",
+      "comment": "@pytest.mark.xfail(reason=\"This test is expected to fail\")\n    def test_failure() -> None:\n        \"\"\"A test that should fail.\"\"\"\n>       raise AssertionError(\"This test is expected to fail\")\nE       AssertionError: This test is expected to fail\n\ntests/test_plugin.py:16: AssertionError",
+      "duration": 0.025561
+    },
+    {
+      "testKey": "test_skipped",
+      "start": "2025-05-21T14:14:44.151977+00:00",
+      "evidence": [
+        {
+          "data": "KCcvVXNlcnMvam9uYXRoYW4ua2l0dGVsbC9weXRlc3QteHJheS1yZXBvcnRlci90ZXN0cy90ZXN0X3BsdWdpbi5weScsIDE5LCAnU2tpcHBlZDogVGhpcyB0ZXN0IGlzIHNraXBwZWQnKQ==",
+          "filename": "stacktrace.txt",
+          "contentType": "text/plain"
+        },
+        {
+          "data": "",
+          "filename": "test.log",
+          "contentType": "text/plain"
+        }
+      ],
+      "steps": [],
+      "defects": [],
+      "customFields": [
+        {
+          "id": "test_path",
+          "name": "Test Path",
+          "value": "tests/test_plugin.py::test_skipped"
+        }
+      ],
+      "finish": "2025-05-21T14:14:44.152198+00:00",
+      "status": "SKIPPED",
+      "comment": "('/Users/jonathan.kittell/pytest-xray-reporter/tests/test_plugin.py', 19, 'Skipped: This test is skipped')",
+      "duration": 0.026051
+    },
+    {
+      "testKey": "test_with_output",
+      "start": "2025-05-21T14:14:44.152359+00:00",
+      "evidence": [
+        {
+          "data": "VGhpcyBpcyBzdGRvdXQK",
+          "filename": "stdout.txt",
+          "contentType": "text/plain"
+        },
+        {
+          "data": "VGhpcyBpcyBzdGRlcnIK",
+          "filename": "stderr.txt",
+          "contentType": "text/plain"
+        },
+        {
+          "data": "",
+          "filename": "test.log",
+          "contentType": "text/plain"
+        }
+      ],
+      "steps": [],
+      "defects": [],
+      "customFields": [
+        {
+          "id": "test_path",
+          "name": "Test Path",
+          "value": "tests/test_plugin.py::test_with_output"
+        }
+      ],
+      "finish": "2025-05-21T14:14:44.152880+00:00",
+      "status": "PASSED",
+      "comment": "",
+      "duration": 0.026733
+    }
+  ],
+  "info": {
+    "summary": {
+      "total": 4,
+      "passed": 2,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 2,
+      "duration": 0.09609100000000001
+    },
+    "testEnvironments": [
+      "Darwin",
+      "24.4.0",
+      "3.13.1"
+    ],
+    "project": null,
+    "testPlanKey": null,
+    "testExecutionKey": null
+  }
+}

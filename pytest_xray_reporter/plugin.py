@@ -35,15 +35,22 @@ class XrayReporter:
         self.start_time = datetime.now(timezone.utc)
         self._current_test: Optional[Dict[str, Any]] = None
         self.marker_reasons: Dict[str, List[Dict[str, str]]] = {}  # nodeid -> list of marker info
+        self.test_key = config.getoption("--xray-test-key")
+        if not self.test_key:
+            import warnings
+            warnings.warn(
+                "No Xray test key provided. Using test function name as test key. "
+                "Results may not be properly linked in Jira Xray.",
+                UserWarning
+            )
 
     def pytest_runtest_logstart(self, nodeid: str) -> None:
         """Record test start time."""
-        # Extract test name from nodeid
-        # e.g., "tests/test_plugin.py::test_with_output" -> "test_with_output"
-        test_name = nodeid.split("::")[-1]
+        # Use provided test key or fall back to test name
+        test_key = self.test_key or nodeid.split("::")[-1]
 
         self._current_test = {
-            "testKey": test_name,
+            "testKey": test_key,
             "start": datetime.now(timezone.utc).isoformat(),
             "evidence": [],
             "steps": [],
@@ -208,33 +215,39 @@ class XrayReporter:
 
 def pytest_addoption(parser: pytest.Parser) -> None:
     """Add command line options."""
-    group = parser.getgroup("xray-reporter")
-    group.addoption(
+    parser.addoption(
         "--xray-output",
         action="store",
-        default="xray-results.json",
-        help="Path to output Xray JSON report",
+        default="xray-report.json",
+        help="Output file for Xray JSON report",
     )
-    group.addoption(
+    parser.addoption(
         "--xray-project",
         action="store",
         help="Xray project key",
     )
-    group.addoption(
+    parser.addoption(
         "--xray-test-plan",
         action="store",
-        help="Xray Test Plan key",
+        help="Xray test plan key",
     )
-    group.addoption(
+    parser.addoption(
         "--xray-test-execution",
         action="store",
-        help="Xray Test Execution key",
+        help="Xray test execution key",
+    )
+    parser.addoption(
+        "--xray-test-key",
+        action="store",
+        help="Xray test key to use for all tests (if not provided, uses test function name and logs a warning)",
     )
 
 
 def pytest_configure(config: pytest.Config) -> None:
-    """Register the plugin."""
-    config.pluginmanager.register(XrayReporter(config), name="xray-reporter")
+    """Configure the plugin."""
+    if config.getoption("--xray-output"):
+        reporter = XrayReporter(config)
+        config.pluginmanager.register(reporter)
 
 
 def pytest_collection_modifyitems(

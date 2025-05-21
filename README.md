@@ -1,6 +1,6 @@
 # pytest-xray-reporter
 
-A pytest plugin that generates test results in Xray JSON format.
+A pytest plugin that generates Xray JSON reports for test results.
 
 ## Installation
 
@@ -10,161 +10,123 @@ pip install pytest-xray-reporter
 
 ## Usage
 
-Run pytest with the plugin to generate Xray JSON results:
+The plugin can be used with pytest to generate Xray JSON reports. It supports various command line options to configure the report generation.
+
+### Basic Usage
 
 ```bash
-pytest --xray-output=results.json
+pytest --xray-output=xray-report.json
 ```
 
 ### Command Line Options
 
-- `--xray-output`: Path to output Xray JSON report (default: "xray-results.json")
+- `--xray-output`: Output file for Xray JSON report (default: "xray-report.json")
 - `--xray-project`: Xray project key
-- `--xray-test-plan`: Xray Test Plan key
-- `--xray-test-execution`: Xray Test Execution key
+- `--xray-test-plan`: Xray test plan key
+- `--xray-test-execution`: Xray test execution key
+- `--xray-test-key`: Xray test key to use for all tests (if not provided, uses test function name and logs a warning)
 
-Example:
+### Example
+
 ```bash
-pytest --xray-output=results.json \
+# Using a specific test key
+pytest --xray-output=xray-report.json \
        --xray-project=PROJ \
-       --xray-test-plan=PLAN-1 \
-       --xray-test-execution=EXEC-1
+       --xray-test-plan=PROJ-123 \
+       --xray-test-execution=PROJ-456 \
+       --xray-test-key=PROJ-789
+
+# Using test function names as test keys (will show a warning)
+pytest --xray-output=xray-report.json \
+       --xray-project=PROJ \
+       --xray-test-plan=PROJ-123 \
+       --xray-test-execution=PROJ-456
 ```
 
-## JSON Output Structure
+## Report Format
 
-The plugin generates a JSON file with the following structure:
+The plugin generates a JSON report in the following format:
 
 ```json
 {
-    "tests": [
+  "tests": [
+    {
+      "testKey": "PROJ-789",  // Or test function name if --xray-test-key is not provided
+      "start": "2024-03-21T10:00:00+00:00",
+      "finish": "2024-03-21T10:00:01+00:00",
+      "status": "PASSED",
+      "comment": "",
+      "evidence": [
         {
-            "testKey": "test_file.py::test_name",
-            "start": "2024-03-21T10:00:00+00:00",
-            "finish": "2024-03-21T10:00:01+00:00",
-            "status": "PASSED",  // One of: PASSED, FAILED, ERROR, SKIPPED
-            "comment": "Error message if test failed",
-            "evidence": [
-                {
-                    "data": "base64_encoded_content",
-                    "filename": "stdout.txt",
-                    "contentType": "text/plain"
-                },
-                {
-                    "data": "base64_encoded_content",
-                    "filename": "stderr.txt",
-                    "contentType": "text/plain"
-                },
-                {
-                    "data": "base64_encoded_content",
-                    "filename": "stacktrace.txt",
-                    "contentType": "text/plain"
-                }
-            ],
-            "steps": [],
-            "defects": [],
-            "customFields": {},
-            "duration": 1.0
+          "data": "base64_encoded_data",
+          "filename": "stdout.txt",
+          "contentType": "text/plain"
         }
-    ],
-    "info": {
-        "summary": {
-            "total": 4,
-            "passed": 2,
-            "failed": 1,
-            "errors": 0,
-            "skipped": 1,
-            "duration": 0.12
-        },
-        "testEnvironments": [
-            "Darwin",        // Operating system
-            "24.4.0",        // OS version
-            "3.13.0"         // Python version
-        ],
-        "project": "PROJ",           // Optional: Xray project key
-        "testPlanKey": "PLAN-1",     // Optional: Test plan key
-        "testExecutionKey": "EXEC-1"  // Optional: Test execution key
+      ],
+      "customFields": [
+        {
+          "id": "test_path",
+          "name": "Test Path",
+          "value": "test_file.py::test_function"
+        }
+      ]
     }
+  ],
+  "info": {
+    "summary": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 1.0
+    },
+    "testEnvironments": [
+      "Linux",
+      "5.4.0",
+      "Python 3.9.0"
+    ],
+    "project": "PROJ",
+    "testPlanKey": "PROJ-123",
+    "testExecutionKey": "PROJ-456"
+  }
 }
 ```
 
-### Test Result Fields
+## Features
 
-- `testKey`: Unique identifier for the test (pytest nodeid)
-- `start`: Test start time in ISO format
-- `finish`: Test end time in ISO format
-- `status`: Test outcome (PASSED, FAILED, ERROR, SKIPPED)
-- `comment`: Error message or skip reason if applicable
-- `evidence`: Array of test output and logs
-  - `data`: Base64 encoded content
-  - `filename`: Type of evidence (stdout.txt, stderr.txt, stacktrace.txt)
-  - `contentType`: MIME type of the content
-- `steps`: Array for test steps (if any)
-- `defects`: Array for related defects (if any)
-- `customFields`: Additional test metadata
-- `duration`: Test duration in seconds
+- Generates Xray-compatible JSON reports
+- Captures test output (stdout, stderr)
+- Includes test duration
+- Supports test execution keys
+- Supports test plan keys
+- Supports project keys
+- Supports custom test keys (optional, falls back to test function name with warning)
+- Captures test evidence (output, logs, stack traces)
+- Includes test environment information
+- Supports custom fields from pytest markers
 
-### Summary Information
+## Test Status Mapping
 
-- `total`: Total number of tests
-- `passed`: Number of passed tests
-- `failed`: Number of failed tests
-- `errors`: Number of tests with errors
-- `skipped`: Number of skipped tests
-- `duration`: Total test execution time
+The plugin maps pytest outcomes to Xray statuses:
 
-### Environment Information
+- `passed` → `PASSED`
+- `failed` → `FAILED`
+- `error` → `ERROR`
+- `skipped` → `SKIPPED`
+- Other outcomes → `UNKNOWN`
 
-- `testEnvironments`: Array containing:
-  - Operating system
-  - OS version
-  - Python version
+## Custom Fields
 
-## Example
+The plugin automatically includes the following custom fields:
 
-```python
-# test_example.py
-def test_success():
-    assert True
+- `test_path`: The full path to the test function
+- Any pytest markers with values (except internal pytest markers)
 
-def test_failure():
-    assert False, "This test is expected to fail"
+## Contributing
 
-@pytest.mark.skip(reason="This test is skipped")
-def test_skipped():
-    assert True
-
-def test_with_output(capsys):
-    print("This is stdout")
-    print("This is stderr", file=sys.stderr)
-    assert True
-```
-
-Run the tests:
-```bash
-pytest --xray-output=results.json test_example.py
-```
-
-The generated `results.json` will contain:
-- All test results with their status
-- Captured stdout/stderr
-- Stack traces for failures
-- Skip reasons
-- Summary statistics
-- Environment information
-
-## Development
-
-1. Clone the repository
-2. Install development dependencies:
-   ```bash
-   pip install -e ".[dev]"
-   ```
-3. Run tests:
-   ```bash
-   pytest
-   ```
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-MIT License
+This project is licensed under the MIT License - see the LICENSE file for details.
