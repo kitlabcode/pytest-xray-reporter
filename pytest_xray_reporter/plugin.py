@@ -10,6 +10,18 @@ from typing import Any, Dict, List, Optional
 import pytest
 
 
+def ensure_timezone(dt: datetime) -> datetime:
+    """Ensure datetime has timezone info, defaulting to UTC if none."""
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt
+
+
+def to_isoformat(dt: datetime) -> str:
+    """Convert datetime to ISO format string with timezone."""
+    return ensure_timezone(dt).isoformat()
+
+
 class XrayReporter:
     """Pytest plugin that generates Xray JSON reports."""
 
@@ -32,7 +44,7 @@ class XrayReporter:
                 "testExecutionKey": None,
             },
         }
-        self.start_time = datetime.now(timezone.utc)
+        self.start_time = ensure_timezone(datetime.now(timezone.utc))
         self._current_test: Optional[Dict[str, Any]] = None
         self.marker_reasons: Dict[str, List[Dict[str, str]]] = {}  # nodeid -> list of marker info
         self.test_key = config.getoption("--xray-test-key")
@@ -53,7 +65,7 @@ class XrayReporter:
 
         self._current_test = {
             "testKey": test_key,
-            "start": datetime.now(timezone.utc).isoformat(),
+            "start": to_isoformat(datetime.now(timezone.utc)),
             "evidence": [],
             "steps": [],
             "defects": [],
@@ -113,7 +125,7 @@ class XrayReporter:
                 )
 
             # Calculate test duration
-            finish_time = datetime.now(timezone.utc)
+            finish_time = ensure_timezone(datetime.now(timezone.utc))
             duration = (finish_time - self.start_time).total_seconds()
 
             # Add test metadata
@@ -156,7 +168,7 @@ class XrayReporter:
             # Create test result in Xray format
             self._current_test.update(
                 {
-                    "finish": finish_time.isoformat(),
+                    "finish": to_isoformat(finish_time),
                     "status": self._get_status(report.outcome),
                     "comment": str(report.longrepr) if report.longrepr else "",
                     "evidence": evidence,
