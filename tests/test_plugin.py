@@ -1,9 +1,10 @@
 """Tests for the pytest-xray-reporter plugin."""
 
 import sys
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytest
+
 from pytest_xray_reporter.plugin import to_isoformat
 
 

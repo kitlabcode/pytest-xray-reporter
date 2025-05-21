@@ -19,7 +19,7 @@ def ensure_timezone(dt: datetime) -> datetime:
 
 def to_isoformat(dt: datetime) -> str:
     """Convert datetime to ISO format string with timezone.
-    
+
     Returns datetime in format: YYYY-MM-DDTHH:MM:SS+00:00
     This format is required by Xray API.
     """
@@ -27,10 +27,10 @@ def to_isoformat(dt: datetime) -> str:
     # Strip microseconds
     dt = dt.replace(microsecond=0)
     # Format with timezone including colon
-    s = dt.strftime('%Y-%m-%dT%H:%M:%S%z')
+    s = dt.strftime("%Y-%m-%dT%H:%M:%S%z")
     # Insert colon in timezone
     if len(s) > 5:  # If there's a timezone
-        s = s[:-2] + ':' + s[-2:]  # Insert colon before last 2 digits
+        s = s[:-2] + ":" + s[-2:]  # Insert colon before last 2 digits
     return s
 
 
